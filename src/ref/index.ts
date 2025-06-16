@@ -10,31 +10,33 @@ export function ref<T>(raw: T) {
 	const wrapper = {
 		__v_isRef: true,
 		get value() {
-			console.log('get');
+			// console.group(`%c 現在是 ref get`, 'background:#FF9800; color:#fff');
+			// console.log('target 是：', wrapper);
+			// console.log('key 是：', 'value');
 			track(wrapper, 'value');
-			return raw;
+			return value;
 		},
 		set value(newVal) {
-			console.log('raw', raw);
 			if (newVal !== raw) {
+				// console.group(`%c 現在是 ref set`, 'background:#FF9800; color:#fff');
+				
 				value = isObject(newVal) ? reactive(newVal) : newVal;
-				console.log('come ');
-				raw = newVal;
-				console.log('wrapper', wrapper);
+				// raw = newVal;
+				// console.log('value 是：', value);
 				trigger(wrapper, 'value');
+				// console.groupEnd();
 			}
 		}
 	};
-	console.log('wrapper', wrapper);
 	return wrapper;
 }
 
 export function isRef(val: any): boolean {
-    return !!(val && val.__v_isRef === true);
+	return !!(val && val.__v_isRef === true);
 }
 
 export function unref<T>(ref: { value: T }): T;
 export function unref<T>(ref: T): T;
 export function unref(ref: any) {
-    return isRef(ref) ? ref.value : ref;
+	return isRef(ref) ? ref.value : ref;
 }
