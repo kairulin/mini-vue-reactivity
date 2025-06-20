@@ -1,35 +1,33 @@
-import { reactive } from './reactive';
-import { mount } from './renderer';
-import { isRef, ref, unref } from './ref';
-import { computed } from './computed';
-const state = reactive({ count: 0 });
-// debugger;
+import { h } from './core/vnode/h';
+import {Fragment} from './core/vnode/VNode'
+import { render } from './core/renderer/render';
+import { patch } from './core/renderer/patch';
 
-const stateRef = ref(3);
-const plusOne = computed(() => stateRef.value + 1);
-//  <h1>Count Reactive: ${state.count}</h1>
-//     <button id="add-reactive">+ Reactive</button>
+const container = document.getElementById('app')!;
 
-// <h1>Computed plusOne: ${plusOne.value}</h1>
-//  <h1>Count Ref: ${stateRef.value}</h1>
-function render() {
-	return `
-		<button id="add-ref">+ Ref</button>		
-		<h1>Computed plusOne: ${plusOne.value}</h1>
-  `;
+function MyComponent(props: any) {
+	return h('span', { style: { color: props.color } }, props.label);
 }
 
-mount(document.getElementById('app')!, render);
+const oldVNode = h(Fragment, null, [
+	'前段文字',
+	h('strong', null, '這是 <strong> 元素'),
+	h(MyComponent, { label: '我是組件', color: 'blue' }),
+	'結尾文字'
+]);
 
-document.addEventListener('click', (e) => {
-	const target = e.target as HTMLElement;
-	if (target.id === 'add-reactive') {
-		state.count++;
-	}
-	if (target.id === 'add-ref') {
-		// debugger
-		stateRef.value++;
-	}
-	// console.log('isRef(count):', isRef(stateRef)); // true
-	// console.log('unref(count):', unref(stateRef)); // 當下的數值
-});
+const newVNode = h(Fragment, null, [
+	'前段更新',
+	h('strong', null, '更新後的 strong'),
+	h(MyComponent, { label: '新 Label', color: 'red' }),
+	'尾巴換掉'
+]);
+
+// 初次渲染
+render(oldVNode, container);
+
+// 模擬更新：2秒後觸發
+setTimeout(() => {
+	console.log('⏱ 開始 patch...');
+	patch(oldVNode, newVNode, container);
+}, 2000);

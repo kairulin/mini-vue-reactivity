@@ -22,13 +22,14 @@ const targetMap = new WeakMap();
 
 // track 追蹤  記錄誰用了哪個屬性
 export function track(target: any, key: any) {
-	console.group(`%c 現在是 track`, 'background:#2196F3; color:#fff');
-	console.log('activeEffect 是：', String(activeEffect));
-	console.log('target 是：', target);
-	console.log('key 是：', key);
-	console.log('targetMap 是：', targetMap);
+	if (!activeEffect) return;
+	// console.group(`%c 現在是 track`, 'background:#2196F3; color:#fff');
+	// console.log('activeEffect 是：', String(activeEffect));
+	// console.log('target 是：', target);
+	// console.log('key 是：', key);
+	// console.log('targetMap 是：', targetMap);
 	let depsMap = targetMap.get(target);
-	console.log('depsMap 是：', depsMap);
+	// console.log('depsMap 是：', depsMap);
 	if (!depsMap) {
 		depsMap = new Map();
 		targetMap.set(target, depsMap);
@@ -39,25 +40,23 @@ export function track(target: any, key: any) {
 		deps = new Set();
 		depsMap.set(key, deps);
 	}
-	if (typeof activeEffect === 'function') {
-		// 會加入現在的function -> render
-		deps.add(activeEffect);
-	}
+	// 會加入現在的function -> render
+	deps.add(activeEffect);
 	// console.log('add後 deps 是：', deps);
-	console.groupEnd();
+	// console.groupEnd();
 }
 
 // trigger 觸發 會通知那些有依賴的函數
 export function trigger(target: any, key: any) {
-	console.group(`%c 現在是 trigger`, 'background:#4CAF50; color:#fff');
-	console.log('target 是：', target);
-	console.log('key 是：', key);
-	console.log('targetMap 是：', targetMap);
+	// console.group(`%c 現在是 trigger`, 'background:#4CAF50; color:#fff');
+	// console.log('target 是：', target);
+	// console.log('key 是：', key);
+	// console.log('targetMap 是：', targetMap);
 	const depsMap = targetMap.get(target);
-	console.log('depsMap 是：', depsMap);
+	// console.log('depsMap 是：', depsMap);
 	if (!depsMap) return;
 	const deps = depsMap.get(key);
-	console.log('deps 是：', deps);
+	// console.log('deps 是：', deps);
 	deps?.forEach((depsFn: any) => {
 		if (depsFn.scheduler) {
 			depsFn.scheduler();
@@ -66,5 +65,5 @@ export function trigger(target: any, key: any) {
 		}
 	});
 
-	console.groupEnd();
+	// console.groupEnd();
 }
